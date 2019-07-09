@@ -51,7 +51,7 @@ int main(int argc, char** argv){
     printf("DEBUG: You selected (char full) %s\n", tty);
     int fileDescriptor, serialReadLine;
     char readBuffer[255];  //buffer for reading in serial data
-    fileDescriptor = open(tty, O_RDWR | O_NOCTTY );  //opens socket to serial port
+    fileDescriptor = open(tty, O_RDWR | O_NOCTTY );  //opens to serial port
     if (fileDescriptor < 0) { //checks for a valid file descriptor
         perror(tty); 
         exit(-1); 
