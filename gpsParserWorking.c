@@ -109,7 +109,4 @@ int main(int argc, char** argv){
     double decimalRepEW = degreesEW + (minutesEW / 60.0f);
     printf("%lf%s, %lf%s\n", decimalRepNS, NS, decimalRepEW, EW);  //display position
     return(0);  //done
-
-
-
 }
