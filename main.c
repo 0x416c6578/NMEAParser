@@ -2,29 +2,18 @@
 #include <string.h>
 #include <fcntl.h>
 #include <unistd.h>
+#include "main.h"
 
 #define DEBUG 1
 #define BUF_LEN 100
 #define TIME_LEN 10
 #define GPGGA_STR "$GPGGA"
 
-/*
-Debug printing function
-*/
-void d(char* s) {
-  if (DEBUG) {
-    printf("DEBUG: ");
-    printf(s);
-    printf("\n");
-  }
-}
-
 int main(int argc, char* argv[]) {
   if (argc == 1) {
     printf("Usage: gpsreader <serial port>\n");
     return 0;
   }
-  d(argv[1]);
 
   int fd = open(argv[1], O_RDWR | O_NOCTTY);
   char readBuf[BUF_LEN];
@@ -32,20 +21,33 @@ int main(int argc, char* argv[]) {
 
   for (;;) {
     readLen = read(fd, readBuf, BUF_LEN);
-    readBuf[readLen] = 0; //Null terminate
-    //d(readBuf);
+    readBuf[readLen] = '\0'; //Null terminate
+
+    gpsData* gpggaData;
+
     if (strstr(readBuf, GPGGA_STR)) {
-      d(readBuf);
-      //When we hit a GPGGA packet, tokenise data
-      char *tok = strtok(readBuf, ",");
-      //Make 100% sure we are at the start of the GPGGA sentence
-      if (strstr(tok, GPGGA_STR)) {
-        tok = strtok(NULL, ",");
-        char time[10];
-        time[10] = 0;
-        strcpy(time, tok);
-        d(time);
+      if (parseGPGGA(readBuf, gpggaData)) { //If we have a successful parse
+        //TODO: Print info here
       }
     }
+  }
+}
+
+int parseGPGGA(char* gpggaString, gpsData* dataStore) {
+  if (DEBUG) printf("Sentence: %s", gpggaString);
+
+  //When we hit a GPGGA packet, tokenise gpsData
+  char *tok = strtok(gpggaString, ",");
+  if (strstr(tok, GPGGA_STR)) {
+    //Get time
+    tok = strtok(NULL, ",");
+    char time[10];
+    time[sizeof(time) - 1] = '\0';
+    strcpy(time, tok);
+    if(DEBUG) printf("Time: %s\n", time);
+
+    //Get position data
+    tok = strtok(NULL, ",");
+    //TODO: Handle position data
   }
 }
