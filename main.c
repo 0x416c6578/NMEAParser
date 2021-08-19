@@ -24,9 +24,19 @@ int main(int argc, char* argv[]) {
 
     if (strstr(readBuf, GPGGA_STR)) {
       if (parseGPGGA(readBuf, &pos) == SUCCESS) { //If we have a successful parse of a GPGGA packet
-        //Example prints an OSM link with the position data
-        printf("https://www.openstreetmap.org/search?whereami=1&query=%f%%2C%f\n", pos.lat, pos.lon);
+        //Example can open an OSM link to your position
+        char url[150];
+        char command[150];
+        sprintf(url, "https://www.openstreetmap.org/search?whereami=1&query=%f%%2C%f\n", pos.lat, pos.lon);
+        sprintf(command, "exo-open \"%s\" 0> /dev/null", url);
         close(fd);
+
+        printf("Position: %f,%f.\nOpen in browser (with exo-open)? [y/n]\n", pos.lat, pos.lon);
+        char choice;
+        scanf(" %c", &choice);
+        if (choice == 'y' || choice == 'Y' || choice == 0x0d) {
+          system(command);
+        }
         return(0);
       }
     }
