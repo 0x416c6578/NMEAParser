@@ -17,7 +17,5 @@ typedef struct {
   double lat, lon;
 } position;
 
-void d(char* s);
 int parseGPGGA(char* gpggaString, position* dataStore);
 double parseLatLong(double latLong, bool isPositive);
-void getOSMURL(double lat, double lon);
