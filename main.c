@@ -1,12 +1,9 @@
-#include <stdio.h>
-#include <string.h>
-#include <fcntl.h>
-#include <unistd.h>
 #include "main.h"
 
-#define DEBUG 1
-#define BUF_LEN 100
-#define TIME_LEN 10
+#ifndef DEBUG
+#define DEBUG 0
+#endif
+
 #define GPGGA_STR "$GPGGA"
 
 int main(int argc, char* argv[]) {
@@ -23,17 +20,17 @@ int main(int argc, char* argv[]) {
     readLen = read(fd, readBuf, BUF_LEN);
     readBuf[readLen] = '\0'; //Null terminate
 
-    gpsData* gpggaData;
+    position pos;
 
     if (strstr(readBuf, GPGGA_STR)) {
-      if (parseGPGGA(readBuf, gpggaData)) { //If we have a successful parse
-        //TODO: Print info here
+      if (parseGPGGA(readBuf, &pos) == SUCCESS) { //If we have a successful parse
+        printf("https://www.openstreetmap.org/search?whereami=1&query=%f%%2C%f\n", pos.lat, pos.lon);
       }
     }
   }
 }
 
-int parseGPGGA(char* gpggaString, gpsData* dataStore) {
+int parseGPGGA(char* gpggaString, position* pos) {
   if (DEBUG) printf("Sentence: %s", gpggaString);
 
   //When we hit a GPGGA packet, tokenise gpsData
@@ -41,13 +38,42 @@ int parseGPGGA(char* gpggaString, gpsData* dataStore) {
   if (strstr(tok, GPGGA_STR)) {
     //Get time
     tok = strtok(NULL, ",");
-    char time[10];
-    time[sizeof(time) - 1] = '\0';
-    strcpy(time, tok);
-    if(DEBUG) printf("Time: %s\n", time);
+    if(DEBUG) printf("Time: %s\n", tok);
 
-    //Get position data
+    //Get latitude data
     tok = strtok(NULL, ",");
-    //TODO: Handle position data
+    char lat[15];
+    strcpy(lat, tok);
+    tok = strtok(NULL, ",");
+    bool N;
+    if (strstr(tok, "N")) N = 1;
+    else N = 0;
+    double dLat = parseLatLong(strtod(lat, NULL), N);
+    if(DEBUG) printf("Latitude: %f\n", dLat);
+
+    //Get longitude data
+    tok = strtok(NULL, ",");
+    char lon[15];
+    strcpy(lon, tok);
+    tok = strtok(NULL, ",");
+    bool E;
+    if (strstr(tok, "E")) E = 1;
+    else E = 0;
+    double dLon = parseLatLong(strtod(lon, NULL), E);
+    if(DEBUG) printf("Longitude: %f\n", dLon);
+
+    pos->lat = dLat;
+    pos->lon = dLon;
+
+    return SUCCESS;
   }
+}
+
+/*
+Convert latitude or longitude in form (d)ddmm.mmmmm to format ddd.ddddd as a float
+*/
+double parseLatLong(double latLong, bool isPositive) {
+  int degrees = latLong / 100.0;
+  double minutes = fmod(latLong, 100.0);
+  return isPositive ? (degrees + (minutes / 60.0)) : -(degrees + (minutes / 60.0));
 }

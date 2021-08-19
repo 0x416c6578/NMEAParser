@@ -1,6 +1,23 @@
+#include <stdio.h>
+#include <string.h>
+#include <fcntl.h>
+#include <unistd.h>
+#include <stdlib.h>
+#include <math.h>
+
+#define BUF_LEN 100
+#define TIME_LEN 10
+
+#define SUCCESS 0
+#define FAIL 1
+
+typedef unsigned char bool;
+
 typedef struct {
-  float lat, lon;
-} gpsData;
+  double lat, lon;
+} position;
 
 void d(char* s);
-int parseGPGGA(char* gpggaString, gpsData* dataStore);
+int parseGPGGA(char* gpggaString, position* dataStore);
+double parseLatLong(double latLong, bool isPositive);
+void getOSMURL(double lat, double lon);

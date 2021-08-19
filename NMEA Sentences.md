@@ -7,9 +7,9 @@
 ```
 0: $GPGGA,
 1: hhmmss.ss,       - UTC time
-2: llll.ll,         - latitude
+2: ddmm.mmmmm,      - latitude
 3: N/S,             - latitude is north or south
-4: yyyyy.yy,        - longitude of position
+4: dddmm.mmmmm,      - longitude of position
 5: E/W,             - longitude is east or west
 6: x,               - GPS fix indicator (1 if there is a fix)
 7: xx,              - Number of satellites used
@@ -20,3 +20,4 @@
 12: M,              - Units of geoidal separation
 13: *cc             - Checksum
 ```
+- To convert to 
