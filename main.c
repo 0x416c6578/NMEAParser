@@ -25,6 +25,8 @@ int main(int argc, char* argv[]) {
     if (strstr(readBuf, GPGGA_STR)) {
       if (parseGPGGA(readBuf, &pos) == SUCCESS) { //If we have a successful parse
         printf("https://www.openstreetmap.org/search?whereami=1&query=%f%%2C%f\n", pos.lat, pos.lon);
+        close(fd);
+        return(0);
       }
     }
   }
