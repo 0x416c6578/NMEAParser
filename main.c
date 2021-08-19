@@ -8,7 +8,7 @@
 
 int main(int argc, char* argv[]) {
   if (argc == 1) {
-    printf("Usage: gpsreader <serial port>\n");
+    printf("Usage: nmeaparser <serial port>\n");
     return 0;
   }
 
@@ -16,14 +16,15 @@ int main(int argc, char* argv[]) {
   char readBuf[BUF_LEN];
   int readLen;
 
+  position pos;
+
   for (;;) {
     readLen = read(fd, readBuf, BUF_LEN);
-    readBuf[readLen] = '\0'; //Null terminate
-
-    position pos;
+    readBuf[readLen] = '\0'; //Null terminate!
 
     if (strstr(readBuf, GPGGA_STR)) {
-      if (parseGPGGA(readBuf, &pos) == SUCCESS) { //If we have a successful parse
+      if (parseGPGGA(readBuf, &pos) == SUCCESS) { //If we have a successful parse of a GPGGA packet
+        //Example prints an OSM link with the position data
         printf("https://www.openstreetmap.org/search?whereami=1&query=%f%%2C%f\n", pos.lat, pos.lon);
         close(fd);
         return(0);
@@ -32,6 +33,9 @@ int main(int argc, char* argv[]) {
   }
 }
 
+/*
+Parse a string containing a GPGGA packet
+*/
 int parseGPGGA(char* gpggaString, position* pos) {
   if (DEBUG) printf("Sentence: %s", gpggaString);
 
