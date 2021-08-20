@@ -17,5 +17,9 @@ typedef struct {
   double lat, lon;
 } position;
 
+typedef struct {
+  position pos;
+} gpsData;
+
 int parseGPGGA(char* gpggaString, position* dataStore);
 double parseLatLong(double latLong, bool isPositive);

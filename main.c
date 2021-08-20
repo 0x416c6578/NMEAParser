@@ -26,17 +26,17 @@ int main(int argc, char* argv[]) {
       if (parseGPGGA(readBuf, &pos) == SUCCESS) { //If we have a successful parse of a GPGGA packet
         //Example can open an OSM link to your position
         char url[150];
-        char command[150];
+        char command[200];
         sprintf(url, "https://www.openstreetmap.org/search?whereami=1&query=%f%%2C%f\n", pos.lat, pos.lon);
         sprintf(command, "exo-open \"%s\" 0> /dev/null", url);
-        close(fd);
 
-        printf("Position: %f,%f.\nOpen in browser (with exo-open)? [y/n]\n", pos.lat, pos.lon);
+        printf("Position: %f,%f.\nOpen in browser (with exo-open)? [y/n]: ", pos.lat, pos.lon);
         char choice;
         scanf(" %c", &choice);
         if (choice == 'y' || choice == 'Y' || choice == 0x0d) {
           system(command);
         }
+
         return(0);
       }
     }
@@ -80,6 +80,26 @@ int parseGPGGA(char* gpggaString, position* pos) {
 
     pos->lat = dLat;
     pos->lon = dLon;
+
+    //See whether we have a lock
+    tok = strtok(NULL, ",");
+    if (strstr(tok, "1")) {
+      if(DEBUG) printf("Lock obtained\n");
+    } else {
+      if(DEBUG) printf("No lock");
+    }
+
+    //Print the number of sattelites used
+    tok = strtok(NULL, ",");
+    if(DEBUG) printf("%s sattelites used\n", tok);
+
+    tok = strtok(NULL, ","); //Horizontal dilution of precision (not used)
+
+    //Print altitude
+    tok = strtok(NULL, ",");
+    if(DEBUG) printf("Altitude: %s%s\n", tok, strtok(NULL, ","));
+
+    //TODO: Calculate and validate packets with checksum
 
     return SUCCESS;
   }

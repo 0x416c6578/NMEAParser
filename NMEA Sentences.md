@@ -20,4 +20,3 @@
 12: M,              - Units of geoidal separation
 13: *cc             - Checksum
 ```
-- To convert to 
